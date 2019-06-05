@@ -10,17 +10,20 @@ import kotlin.random.Random
 
 /**This Activity displays a wheel of user-entered choices, along with a button that allows the user to spin the wheel.
  * The wheel will eventually stop on one of the possible choices based on the random amount of degrees it's spun.
-**/
+ **/
 class MainActivity : AppCompatActivity() {
 
-    private val dummyColors = intArrayOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN)
+    private val dummyChoices =
+        arrayOf("Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6", "Choice7", "Choice8")
+    private val dummyColors =
+        intArrayOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN)
     private var wheelStartingDegrees = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val wheelBitMap: Bitmap = drawWheel(dummyColors)
+        val wheelBitMap: Bitmap = drawWheel(dummyChoices)
         wheel_view.setImageBitmap(wheelBitMap)
 
         spin_button.setOnClickListener {
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Draw wheel based on width of screen and colors given
-    private fun drawWheel(colors: IntArray): Bitmap {
+    private fun drawWheel(choices: Array<String>): Bitmap {
         val width = getWidthOfScreen()
         val bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
 
@@ -41,14 +44,41 @@ class MainActivity : AppCompatActivity() {
         paint.style = Paint.Style.FILL
 
         var startAngle = 0f
-        val angleDegreesPerSection: Float = DEGREES_IN_CIRCLE / colors.size
+        val angleDegreesPerSection: Float = DEGREES_IN_CIRCLE / choices.size
 
-        colors.forEach {
-            paint.color = it
+        choices.forEachIndexed { index, choiceText ->
+            paint.color = dummyColors[index]
             canvas.drawArc(rectF, startAngle, angleDegreesPerSection, true, paint)
-            startAngle += angleDegreesPerSection
+
+            val endAngle = startAngle + angleDegreesPerSection
+            val medianAngle = (startAngle + endAngle) / 2
+
+            drawChoiceText(choiceText, canvas, paint, medianAngle)
+
+            startAngle = endAngle
         }
         return bitmap
+    }
+
+    //Create text for choice around the center and along the angle of its section of the wheel
+    private fun drawChoiceText(choiceText: String, canvas: Canvas, paint: Paint, medianAngle: Float) {
+        paint.color = Color.WHITE
+        paint.textSize = 48f
+        val rect = Rect()
+        paint.getTextBounds(choiceText, 0, choiceText.length, rect)
+
+        canvas.save()
+        canvas.rotate(
+            medianAngle,
+            canvas.width / 2f,
+            canvas.height / 2f
+        )
+        canvas.drawText(
+            choiceText,
+            canvas.width * .75f,
+            canvas.height / 2f, paint
+        )
+        canvas.restore()
     }
 
     private fun getWidthOfScreen(): Int {
@@ -69,7 +99,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Create animation that rotates object around its center a certain amount of degrees and keeps it there
-    private fun createRotateAnimation(fromDegrees: Float, toDegrees: Float) : RotateAnimation {
+    private fun createRotateAnimation(fromDegrees: Float, toDegrees: Float): RotateAnimation {
         val rotateAnimation = RotateAnimation(
             fromDegrees, toDegrees,
             Animation.RELATIVE_TO_SELF, .5f,
@@ -81,9 +111,11 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationStart(p0: Animation?) {
                 spin_button.isClickable = false
             }
+
             override fun onAnimationEnd(p0: Animation?) {
                 spin_button.isClickable = true
             }
+
             override fun onAnimationRepeat(p0: Animation?) {}
         })
         return rotateAnimation
