@@ -19,7 +19,7 @@
             android:layout_marginLeft="32dp" android:layout_marginTop="32dp"/>
     <Button
             android:id="@+id/spin_button"
-            android:text="Spin"
+            android:text="@string/spin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -28,5 +28,15 @@
             android:layout_marginBottom="32dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"/>
+    <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_wheel_arrow_black_24dp"
+            android:rotation="-90"
+            app:layout_constraintBottom_toBottomOf="@+id/wheel_view"
+            app:layout_constraintTop_toTopOf="@+id/wheel_view"
+            app:layout_constraintStart_toEndOf="@+id/wheel_view"
+            app:layout_constraintEnd_toEndOf="@+id/wheel_view"/>
 
 </android.support.constraint.ConstraintLayout>

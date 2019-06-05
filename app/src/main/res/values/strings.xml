@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WheelApp</string>
+    <string name="spin">Spin</string>
 </resources>
