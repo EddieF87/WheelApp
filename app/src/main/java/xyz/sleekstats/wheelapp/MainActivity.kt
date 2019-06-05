@@ -1,11 +1,16 @@
 package xyz.sleekstats.wheelapp
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.graphics.*
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import xyz.sleekstats.wheelapp.db.WheelChoiceDAO
+import xyz.sleekstats.wheelapp.db.WheelChoiceDatabase
+import xyz.sleekstats.wheelapp.model.WheelChoice
 import kotlin.random.Random
 
 /**This Activity displays a wheel of user-entered choices, along with a button that allows the user to spin the wheel.
@@ -13,17 +18,34 @@ import kotlin.random.Random
  **/
 class MainActivity : AppCompatActivity() {
 
-    private val dummyChoices =
-        arrayOf("Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6", "Choice7", "Choice8")
-    private val dummyColors =
-        intArrayOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN)
+    private lateinit var wheelChoices: Array<WheelChoice>
     private var wheelStartingDegrees = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val wheelBitMap: Bitmap = drawWheel(dummyChoices)
+        val dao = initiateDBAndDao()
+        getChoices(dao)
+    }
+
+    //initiate database and get DAO for wheel choices, to be moved out of activity soon
+    private fun initiateDBAndDao() : WheelChoiceDAO {
+        val db = WheelChoiceDatabase.getDatabase(applicationContext)
+        return db.wheelChoiceDao()
+    }
+
+    //retrieve choices from Room database and then build a wheel if two or more choices are retrieved
+    private fun getChoices(dao: WheelChoiceDAO) = GlobalScope.launch {
+        wheelChoices = dao.getAllWheelChoices().toTypedArray()
+        if (wheelChoices.size > 1) {
+            buildWheel()
+        }
+    }
+
+
+    private fun buildWheel() {
+        val wheelBitMap: Bitmap = drawWheel(wheelChoices)
         wheel_view.setImageBitmap(wheelBitMap)
 
         spin_button.setOnClickListener {
@@ -33,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Draw wheel based on width of screen and colors given
-    private fun drawWheel(choices: Array<String>): Bitmap {
+    private fun drawWheel(choices: Array<WheelChoice>): Bitmap {
         val width = getWidthOfScreen()
         val bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
 
@@ -46,14 +68,14 @@ class MainActivity : AppCompatActivity() {
         var startAngle = 0f
         val angleDegreesPerSection: Float = DEGREES_IN_CIRCLE / choices.size
 
-        choices.forEachIndexed { index, choiceText ->
-            paint.color = dummyColors[index]
+        choices.forEach {
+            paint.color = it.colorIndex
             canvas.drawArc(rectF, startAngle, angleDegreesPerSection, true, paint)
 
             val endAngle = startAngle + angleDegreesPerSection
             val medianAngle = (startAngle + endAngle) / 2
 
-            drawChoiceText(choiceText, canvas, paint, medianAngle)
+            drawChoiceText(it.text, canvas, paint, medianAngle)
 
             startAngle = endAngle
         }
