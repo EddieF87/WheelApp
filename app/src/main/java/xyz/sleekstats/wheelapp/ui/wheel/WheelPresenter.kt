@@ -4,8 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import xyz.sleekstats.wheelapp.WheelUtils
 import xyz.sleekstats.wheelapp.model.WheelChoice
-import kotlin.random.Random
 
 class WheelPresenter(private val wheelView: WheelContract.View) :
     WheelContract.Presenter {
@@ -13,14 +13,17 @@ class WheelPresenter(private val wheelView: WheelContract.View) :
     var wheelStartingDegrees = 0f
     var wheelEndingDegrees = 0f
     var wheelChoices: List<WheelChoice> = arrayListOf()
+    private val wheelUtils = WheelUtils()
 
     private val wheelChoiceDatabase = wheelView.provideDatabase()
     private val wheelChoiceDAO = wheelChoiceDatabase.wheelChoiceDao()
 
+    //Retrieve all wheel choices from database, filtering out those without text.
+    // If there's at least 2 tell view to build a wheel with choices.
     override fun getWheelChoices() {
         CoroutineScope(Dispatchers.Main).launch {
             wheelChoices =
-                withContext(Dispatchers.IO) { wheelChoiceDAO.getAllWheelChoices() }
+                withContext(Dispatchers.IO) { wheelChoiceDAO.getAllWheelChoices().filter { it.text.isNotEmpty() } }
             if (wheelChoices.size > 1) {
                 wheelView.buildWheel(wheelChoices)
             } else {
@@ -29,38 +32,26 @@ class WheelPresenter(private val wheelView: WheelContract.View) :
         }
     }
 
+    //Get random amount of degrees to spin wheel, then calculate start and end point, then spin wheel based on this.
     override fun determineSpin() {
-        val degreesToSpin = SMALLEST_SPIN + Random.nextInt(SPIN_VARIANCE)
+        val degreesToSpin = wheelUtils.determineDegreesToSpin()
         wheelEndingDegrees = wheelStartingDegrees + degreesToSpin
 
         wheelView.spinWheel(wheelStartingDegrees, wheelEndingDegrees)
 
         wheelStartingDegrees = wheelEndingDegrees
-
-        determineChoiceWheelLandsOn(wheelStartingDegrees.toInt())
     }
 
-    private fun determineChoiceWheelLandsOn(wheelPosition: Int) {
 
-        val finalAngle: Int = getFinalAngle(wheelPosition)
+    //Given final angle the wheel is rotated to, determine which choice is selected and send this info to WheelActivity.
+    override fun determineChoiceWheelLandsOn(wheelPosition: Int) {
+
         val sections = wheelChoices.size
-        val sectionLength = getSectionLength(sections)
-        val wheelSectionIndex = getWheelSectionIndex(finalAngle, sectionLength)
+        val finalAngle: Int = wheelUtils.getFinalAngle(wheelPosition)
+        val sectionLength = wheelUtils.getSectionLength(sections)
+        val wheelSectionIndex = wheelUtils.getWheelSectionIndex(finalAngle, sectionLength)
         val choiceLandedOn = wheelChoices[wheelSectionIndex]
 
         wheelView.displayWinner(choiceLandedOn.text, choiceLandedOn.colorIndex)
-    }
-
-    private fun getFinalAngle(landingSpotInDegrees: Int): Int =
-        landingSpotInDegrees % WheelActivity.DEGREES_IN_CIRCLE.toInt()
-
-    private fun getSectionLength(sections: Int): Int = WheelActivity.DEGREES_IN_CIRCLE.toInt() / sections
-
-    private fun getWheelSectionIndex(finalAngle: Int, sectionLength: Int): Int = finalAngle / sectionLength
-
-    companion object {
-        const val SMALLEST_SPIN = 500
-        const val LARGEST_SPIN = 1500
-        const val SPIN_VARIANCE = LARGEST_SPIN - SMALLEST_SPIN
     }
 }

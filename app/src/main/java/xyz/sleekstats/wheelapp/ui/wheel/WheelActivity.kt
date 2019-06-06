@@ -62,6 +62,7 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
             }
 
             override fun onAnimationEnd(p0: Animation?) {
+                wheelPresenter.determineChoiceWheelLandsOn(toDegrees.toInt())
                 spin_button.isClickable = true
             }
 

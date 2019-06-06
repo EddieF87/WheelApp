@@ -16,5 +16,6 @@ interface WheelContract {
     interface Presenter {
         fun getWheelChoices()
         fun determineSpin()
+        fun determineChoiceWheelLandsOn(wheelPosition: Int)
     }
 }
