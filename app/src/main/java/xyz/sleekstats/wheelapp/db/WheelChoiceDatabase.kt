@@ -2,13 +2,12 @@ package xyz.sleekstats.wheelapp.db
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.sleekstats.wheelapp.model.WheelChoice
 
 @Database(entities = [WheelChoice::class], version = 1)
@@ -41,7 +40,7 @@ abstract class WheelChoiceDatabase : RoomDatabase() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         // moving to a new thread
-                        GlobalScope.launch {
+                        CoroutineScope(Dispatchers.IO).launch {
                             INSTANCE?.wheelChoiceDao()?.insertAll(PREPOPULATE_DATA)
                         }
                     }
