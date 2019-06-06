@@ -69,6 +69,7 @@
             android:layout_height="wrap_content"
             android:text="@string/done"
             android:layout_margin="32dp"
-            android:padding="32dp"
+            android:padding="16dp"
+            android:textSize="24sp"
     />
 </LinearLayout>
