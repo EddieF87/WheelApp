@@ -1,4 +1,4 @@
-package xyz.sleekstats.wheelapp
+package xyz.sleekstats.wheelapp.util
 
 import xyz.sleekstats.wheelapp.ui.wheel.WheelActivity
 import kotlin.random.Random
@@ -11,7 +11,9 @@ class WheelUtils {
 
     fun getFinalAngle(landingSpotInDegrees: Int): Int = landingSpotInDegrees % WheelActivity.DEGREES_IN_CIRCLE.toInt()
 
-    fun determineDegreesToSpin(): Int = SMALLEST_SPIN + Random.nextInt(SPIN_VARIANCE)
+    fun determineDegreesToSpin(): Int = SMALLEST_SPIN + Random.nextInt(
+        SPIN_VARIANCE
+    )
 
 
     companion object {

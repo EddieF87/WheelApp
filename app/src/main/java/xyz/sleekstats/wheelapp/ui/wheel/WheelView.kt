@@ -3,18 +3,16 @@ package xyz.sleekstats.wheelapp.ui.wheel
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
+import xyz.sleekstats.wheelapp.R
 import xyz.sleekstats.wheelapp.model.WheelChoice
+import xyz.sleekstats.wheelapp.util.ColorUtils
 
-class WheelView(context: Context, attributeSet: AttributeSet?) : ImageView(context, attributeSet) {
+class WheelView(context: Context, attributeSet: AttributeSet?) : AppCompatImageView(context, attributeSet) {
 
-    private val backgroundAndTextColorsMap: Map<Int, Int> = mapOf(
-        Color.RED to Color.WHITE,
-        Color.BLUE to Color.WHITE,
-        Color.GREEN to Color.BLACK,
-        Color.YELLOW to Color.BLACK,
-        Color.MAGENTA to Color.BLACK
-    )
+    private val colorUtils = ColorUtils()
+    private val wheelTextSize = resources.getDimension(R.dimen.wheelTextSize)
+    private val wheelBorder = resources.getInteger(R.integer.wheelBorder)
 
     //Draw wheel based on width of screen and colors given
     fun drawWheel(choices: List<WheelChoice>, screenWidth: Int): Bitmap {
@@ -22,15 +20,14 @@ class WheelView(context: Context, attributeSet: AttributeSet?) : ImageView(conte
 
         val canvas = Canvas(bitmap)
 
-
         val rectFull = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
 
-        val rectF = RectF(10f, 10f, bitmap.width.toFloat() - 10f, bitmap.height.toFloat() - 10f)
+        val rectF = RectF(wheelBorder.toFloat(), wheelBorder.toFloat(), bitmap.width.toFloat() - wheelBorder.toFloat(), bitmap.height.toFloat() - wheelBorder.toFloat())
 
         val paint = Paint()
         paint.isAntiAlias = true
         paint.style = Paint.Style.FILL
-        paint.color = Color.BLACK
+        paint.color = Color.parseColor("#404040")
         canvas.drawArc(rectFull, 0f, 360f, true, paint)
 
         var startAngle = 0f
@@ -53,8 +50,13 @@ class WheelView(context: Context, attributeSet: AttributeSet?) : ImageView(conte
 
     //Create text for choice around the center and along the angle of its section of the wheel
     private fun drawChoiceText(choiceText: String, canvas: Canvas, paint: Paint, medianAngle: Float) {
-        paint.color = backgroundAndTextColorsMap[paint.color] ?: Color.WHITE
-        paint.textSize = 48f
+        paint.color = colorUtils.wheelToTextColorsMap[paint.color] ?: Color.WHITE
+        when {
+            choiceText.length < 10 -> paint.textSize = wheelTextSize
+            choiceText.length < 15 -> paint.textSize = wheelTextSize * .75f
+            else -> paint.textSize = wheelTextSize * 10/choiceText.length
+        }
+
         val rect = Rect()
         paint.getTextBounds(choiceText, 0, choiceText.length, rect)
 

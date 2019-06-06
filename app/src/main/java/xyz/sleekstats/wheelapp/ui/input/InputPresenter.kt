@@ -9,8 +9,18 @@ class InputPresenter(inputView: InputContract.View) :
     private val wheelChoiceDAO = wheelChoiceDatabase.wheelChoiceDao()
 
     override fun insertWheelChoices(wheelChoices: List<WheelChoice>): Int {
-        wheelChoiceDAO.insertAll(wheelChoices)
+        insertOrUpdateChoices(wheelChoices)
         return wheelChoices.filter { it.text.isNotEmpty() }.size
+    }
+
+
+    private fun insertOrUpdateChoices(wheelChoices: List<WheelChoice>) {
+        wheelChoices.forEach {
+            val i = wheelChoiceDAO.insert(it)
+            if (i < 0) {
+                wheelChoiceDAO.updateText(it.text, it.id)
+            }
+        }
     }
 
     override suspend fun getWheelChoices(): List<WheelChoice> {

@@ -15,5 +15,5 @@ data class WheelChoice(
     val id: Long,
     val text: String,
     val colorIndex: Int = Color.BLACK,
-    val timesLandedOn: Int = 0
+    var timesLandedOn: Int = 0
 )

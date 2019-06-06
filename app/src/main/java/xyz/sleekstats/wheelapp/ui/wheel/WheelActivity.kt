@@ -11,13 +11,15 @@ import kotlinx.android.synthetic.main.activity_wheel.*
 import xyz.sleekstats.wheelapp.R
 import xyz.sleekstats.wheelapp.db.WheelChoiceDatabase
 import xyz.sleekstats.wheelapp.model.WheelChoice
+import xyz.sleekstats.wheelapp.util.ColorUtils
 
 /**This Activity displays a wheel of user-entered choices, along with a button that allows the user to spin the wheel.
  * The wheel will eventually stop on one of the possible choices based on the random amount of degrees it's spun.
  **/
 class WheelActivity : AppCompatActivity(), WheelContract.View {
 
-    private lateinit var wheelPresenter : WheelPresenter
+    private lateinit var wheelPresenter: WheelPresenter
+    private val colorUtils = ColorUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,7 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
     }
 
     //Rotate wheel the amount of degrees entered and update starting point
-    override fun spinWheel(wheelStartingDegrees: Float, wheelEndingDegrees : Float) {
+    override fun spinWheel(wheelStartingDegrees: Float, wheelEndingDegrees: Float) {
         val rotateAnimation = createRotateAnimation(wheelStartingDegrees, wheelEndingDegrees)
         wheel_view.startAnimation(rotateAnimation)
     }
@@ -60,6 +62,7 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
         rotateAnimation.interpolator = DecelerateInterpolator()
         rotateAnimation.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(p0: Animation?) {
+                winnerDisplayTextView.text = ""
                 spin_button.isClickable = false
             }
 
@@ -74,7 +77,9 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
     }
 
     override fun displayWinner(choiceText: String, colorCode: Int) {
-        Toast.makeText(this, choiceText, Toast.LENGTH_SHORT).show()
+        winnerDisplayTextView.text = choiceText
+        val color = colorUtils.wheelToBackgroundColorsMap[colorCode]
+        if (color != null) { wheel_layout.setBackgroundColor(color) }
     }
 
     override fun provideDatabase(): WheelChoiceDatabase {
@@ -82,7 +87,7 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
     }
 
     override fun onNotEnoughWheelChoices() {
-        Toast.makeText(this, "Please enter more Wheel choices!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.enter_more_choices_warning), Toast.LENGTH_SHORT).show()
         finish()
     }
 

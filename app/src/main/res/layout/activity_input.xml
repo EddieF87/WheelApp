@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="@dimen/defaultMargin"
 >
 
 
@@ -68,8 +68,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/done"
-            android:layout_margin="32dp"
-            android:padding="16dp"
-            android:textSize="24sp"
+            android:layout_margin="@dimen/largeMargin"
+            android:padding="@dimen/defaultMargin"
+            android:textSize="@dimen/buttonTextSize"
     />
 </LinearLayout>

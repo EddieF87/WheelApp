@@ -2,9 +2,7 @@ package xyz.sleekstats.wheelapp.ui.input
 
 import android.content.Intent
 import android.graphics.Color
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_input.*
@@ -17,7 +15,6 @@ import xyz.sleekstats.wheelapp.R
 import xyz.sleekstats.wheelapp.db.WheelChoiceDatabase
 import xyz.sleekstats.wheelapp.model.WheelChoice
 import xyz.sleekstats.wheelapp.ui.wheel.WheelActivity
-import kotlin.random.Random
 
 class InputActivity : AppCompatActivity(), InputContract.View {
 
@@ -44,7 +41,7 @@ class InputActivity : AppCompatActivity(), InputContract.View {
             option4_input,
             option5_input
         )
-        for(i in 0 until viewList.size) {
+        for (i in 0 until viewList.size) {
             val view = viewList[i]
             view.input_edit_text.hint = "Option ${i + 1}"
             view.color_selector.setBackgroundColor(colorList[i])
@@ -68,6 +65,7 @@ class InputActivity : AppCompatActivity(), InputContract.View {
                 }
                 insertAll(choices)
             }
+
         }
     }
 
@@ -80,7 +78,8 @@ class InputActivity : AppCompatActivity(), InputContract.View {
             if (numberOfChoicesEntered > 1) {
                 goToWheelActivity()
             } else {
-                Toast.makeText(this@InputActivity, "Please enter at least 2 wheel choices!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@InputActivity, getString(R.string.enter_more_choices_warning), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 

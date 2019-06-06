@@ -3,6 +3,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import xyz.sleekstats.wheelapp.util.WheelUtils
 
 /**
  * Unit tests for [getFinalAngle(), getSectionLength(), getWheelSectionIndex(), and determineDegreesToSpin()].

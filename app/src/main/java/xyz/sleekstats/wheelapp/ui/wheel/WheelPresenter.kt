@@ -4,15 +4,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import xyz.sleekstats.wheelapp.WheelUtils
 import xyz.sleekstats.wheelapp.model.WheelChoice
+import xyz.sleekstats.wheelapp.util.WheelUtils
 
 class WheelPresenter(private val wheelView: WheelContract.View) :
     WheelContract.Presenter {
 
-    var wheelStartingDegrees = 0f
-    var wheelEndingDegrees = 0f
-    var wheelChoices: List<WheelChoice> = arrayListOf()
+    private var wheelStartingDegrees = 0f
+    private var wheelEndingDegrees = 0f
+    private var wheelChoices: List<WheelChoice> = arrayListOf()
     private val wheelUtils = WheelUtils()
 
     private val wheelChoiceDatabase = wheelView.provideDatabase()
@@ -52,6 +52,11 @@ class WheelPresenter(private val wheelView: WheelContract.View) :
         val wheelSectionIndex = wheelUtils.getWheelSectionIndex(finalAngle, sectionLength)
         val choiceLandedOn = wheelChoices[wheelSectionIndex]
 
-        wheelView.displayWinner(choiceLandedOn.text, choiceLandedOn.colorIndex)
+        CoroutineScope(Dispatchers.Main).launch {
+            choiceLandedOn.timesLandedOn += 1
+            withContext(Dispatchers.IO) { wheelChoiceDAO.update(choiceLandedOn)}
+            wheelView.displayWinner(choiceLandedOn.text, choiceLandedOn.colorIndex)
+        }
+//        wheelView.displayWinner(choiceLandedOn.text, choiceLandedOn.colorIndex)
     }
 }
