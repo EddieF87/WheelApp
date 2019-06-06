@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_input.*
+import kotlinx.android.synthetic.main.input_item.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,14 +23,12 @@ class InputActivity : AppCompatActivity(), InputContract.View {
 
     private lateinit var inputPresenter: InputPresenter
 
-    private val dummyColors = listOf(
+    private val colorList = listOf(
         Color.MAGENTA,
         Color.YELLOW,
         Color.GREEN,
         Color.RED,
-        Color.BLUE,
-        Color.GRAY,
-        Color.CYAN
+        Color.BLUE
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,35 +37,39 @@ class InputActivity : AppCompatActivity(), InputContract.View {
 
         inputPresenter = InputPresenter(this)
 
+        val viewList = listOf(
+            option1_input,
+            option2_input,
+            option3_input,
+            option4_input,
+            option5_input
+        )
+        for(i in 0 until viewList.size) {
+            val view = viewList[i]
+            view.input_edit_text.hint = "Option ${i + 1}"
+            view.color_selector.setBackgroundColor(colorList[i])
+        }
+
         CoroutineScope(Dispatchers.Main).launch {
             val wheelChoices = withContext(Dispatchers.IO) { inputPresenter.getWheelChoices() }
 
             wheelChoices.forEach {
-                when (it.id.toInt()) {
-                    0 -> option1_edit_text.setText(it.text)
-                    1 -> option2_edit_text.setText(it.text)
-                    2 -> option3_edit_text.setText(it.text)
-                    3 -> option4_edit_text.setText(it.text)
-                    4 -> option5_edit_text.setText(it.text)
-                }
+                val i = it.id.toInt()
+                val view = viewList[i]
+                view.input_edit_text.setText(it.text)
             }
 
             save_choices_button.setOnClickListener {
-                val choices: List<WheelChoice> = listOf(
-                    createWheelChoice(0, option1_edit_text.text.toString()),
-                    createWheelChoice(1, option2_edit_text.text.toString()),
-                    createWheelChoice(2, option3_edit_text.text.toString()),
-                    createWheelChoice(3, option4_edit_text.text.toString()),
-                    createWheelChoice(4, option5_edit_text.text.toString())
-                )
+                val choices = arrayListOf<WheelChoice>()
+                for (i in 0 until viewList.size) {
+                    choices.add(
+                        WheelChoice(i.toLong(), viewList[i].input_edit_text.text.toString(), colorList[i])
+                    )
+                }
                 insertAll(choices)
             }
         }
     }
-
-    private fun createWheelChoice(id: Long, text: String) = WheelChoice(
-        id = id, text = text, colorIndex = dummyColors[Random.nextInt(dummyColors.size)]
-    )
 
     private fun insertAll(choices: List<WheelChoice>) =
         CoroutineScope(Dispatchers.Main).launch {
@@ -74,7 +77,7 @@ class InputActivity : AppCompatActivity(), InputContract.View {
             withContext(Dispatchers.IO) {
                 numberOfChoicesEntered = inputPresenter.insertWheelChoices(choices)
             }
-            if(numberOfChoicesEntered > 1) {
+            if (numberOfChoicesEntered > 1) {
                 goToWheelActivity()
             } else {
                 Toast.makeText(this@InputActivity, "Please enter at least 2 wheel choices!", Toast.LENGTH_SHORT).show()

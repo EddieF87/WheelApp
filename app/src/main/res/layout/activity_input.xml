@@ -11,61 +11,56 @@
     <Space android:layout_width="wrap_content" android:layout_height="0dp"
            android:layout_weight="1"/>
 
-    <EditText
-            android:id="@+id/option1_edit_text"
+    <include
+            android:id="@+id/option1_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 1"
-            android:inputType="text"/>
-
-    <Space android:layout_width="wrap_content" android:layout_height="0dp"
-           android:layout_weight="1"/>
-
-
-    <EditText
-            android:id="@+id/option2_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Option 2"
-            android:inputType="text"
+            layout="@layout/input_item"
     />
 
     <Space android:layout_width="wrap_content" android:layout_height="0dp"
            android:layout_weight="1"/>
 
-    <EditText
-            android:id="@+id/option3_edit_text"
+    <include
+            android:id="@+id/option2_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 3"
-            android:inputType="text"
+            layout="@layout/input_item"
+    />
+
+    <Space android:layout_width="wrap_content" android:layout_height="0dp"
+           android:layout_weight="1"/>
+
+    <include
+            android:id="@+id/option3_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/input_item"
     />
 
     <Space android:layout_width="wrap_content" android:layout_height="0dp"
            android:layout_weight="1"/>
 
 
-    <EditText
-            android:id="@+id/option4_edit_text"
+    <include
+            android:id="@+id/option4_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 4"
-            android:inputType="text"
+            layout="@layout/input_item"
     />
 
     <Space android:layout_width="wrap_content" android:layout_height="0dp"
     android:layout_weight="1"/>
 
-    <EditText
-            android:id="@+id/option5_edit_text"
+    <include
+            android:id="@+id/option5_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 5"
-            android:inputType="text"
+            layout="@layout/input_item"
     />
 
     <Space android:layout_width="wrap_content" android:layout_height="0dp"
-           android:layout_weight="1"/>
+           android:layout_weight="4"/>
 
 
     <Button
@@ -74,5 +69,6 @@
             android:layout_height="wrap_content"
             android:text="@string/done"
             android:layout_margin="32dp"
+            android:padding="32dp"
     />
 </LinearLayout>
