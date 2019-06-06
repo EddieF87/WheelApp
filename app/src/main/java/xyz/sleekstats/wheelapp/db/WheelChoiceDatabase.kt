@@ -16,14 +16,6 @@ abstract class WheelChoiceDatabase : RoomDatabase() {
     abstract fun wheelChoiceDao(): WheelChoiceDAO
 
     companion object {
-        private val PREPOPULATE_DATA = listOf(
-            WheelChoice(text = "CHOICE GREEN", colorIndex = Color.GREEN),
-            WheelChoice(text = "CHOICE RED", colorIndex = Color.RED),
-            WheelChoice(text = "CHOICE BLUE", colorIndex = Color.BLUE),
-            WheelChoice(text = "CHOICE YELLOW", colorIndex = Color.YELLOW),
-            WheelChoice(text = "CHOICE DEFAULT")
-        )
-
         private var INSTANCE: WheelChoiceDatabase? = null
 
         fun getDatabase(context: Context): WheelChoiceDatabase {
@@ -36,15 +28,7 @@ abstract class WheelChoiceDatabase : RoomDatabase() {
                     context.applicationContext,
                     WheelChoiceDatabase::class.java,
                     "wheel_choice_database"
-                ).addCallback(object : Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
-                        // moving to a new thread
-                        CoroutineScope(Dispatchers.IO).launch {
-                            INSTANCE?.wheelChoiceDao()?.insertAll(PREPOPULATE_DATA)
-                        }
-                    }
-                }).build()
+                ).build()
                 INSTANCE = instance
                 return instance
             }

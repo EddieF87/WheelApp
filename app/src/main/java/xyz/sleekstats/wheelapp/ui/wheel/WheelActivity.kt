@@ -80,6 +80,7 @@ class WheelActivity : AppCompatActivity(), WheelContract.View {
 
     override fun onNotEnoughWheelChoices() {
         Toast.makeText(this, "Please enter more Wheel choices!", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     companion object {

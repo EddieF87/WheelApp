@@ -11,8 +11,8 @@ import androidx.room.PrimaryKey
  **/
 @Entity(tableName = "wheel_choice_table")
 data class WheelChoice(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey
+    val id: Long,
     val text: String,
     val colorIndex: Int = Color.BLACK,
     val timesLandedOn: Int = 0
